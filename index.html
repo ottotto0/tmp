@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Image Generator</title>
+</head>
+<body>
+  <h1>Hugging Face Image Generator</h1>
+  <input id="prompt" placeholder="プロンプトを入力" />
+  <button onclick="generate()">Generate</button>
+  <div id="result"></div>
+
+  <script>
+    async function generate() {
+      const prompt = document.getElementById("prompt").value;
+      const res = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById("result").innerHTML =
+        data.image ? `<img src="${data.image}" width="512">` : data.error;
+    }
+  </script>
+</body>
+</html>
