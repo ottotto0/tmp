@@ -1,0 +1,35 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Image Generator</title>
+</head>
+<body>
+  <h1>画像生成フォーム</h1>
+  <textarea id="prompt" rows="4" cols="50" placeholder="プロンプトを入力"></textarea><br/>
+  <button id="sendBtn">送信</button>
+
+  <h2>結果</h2>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const prompt = document.getElementById("prompt").value;
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await res.json();
+      if (data.imageUrl) {
+        document.getElementById("result").innerHTML =
+          `<img src="${data.imageUrl}" width="400"/>`;
+      } else {
+        document.getElementById("result").innerText = "エラー: " + data.error;
+      }
+    });
+  </script>
+</body>
+</html>
