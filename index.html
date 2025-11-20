@@ -30,7 +30,20 @@
   </div>
 
   <script>
-    // Puppeteer が返してきた画像URLをここにセットするための関数
+    /** ---------------------------
+     * ① Puppeteer から img=URL が戻ってきたらすぐ表示
+     * -------------------------- */
+    function getQuery(key) {
+      return new URLSearchParams(window.location.search).get(key);
+    }
+    const imgUrl = getQuery('img');
+    if (imgUrl) {
+      showImage(imgUrl);
+    }
+
+    /** ---------------------------
+     * ② 画像表示関数（Puppeteer が呼んでもOK）
+     * -------------------------- */
     function showImage(imageUrl) {
       const img = document.getElementById('generated-image');
       img.src = imageUrl;
@@ -38,16 +51,16 @@
       document.getElementById('loading').style.display = 'none';
     }
 
-    // フォーム送信 → Puppeteer に渡す処理
+    /** ---------------------------
+     * ③ Puppeteer にプロンプトを渡す処理
+     * -------------------------- */
     document.getElementById('generate-btn').addEventListener('click', () => {
       const prompt = document.getElementById('prompt-input').value;
       if (!prompt) return alert('プロンプトを入力してください');
 
-      // ローディング表示
       document.getElementById('loading').style.display = 'block';
 
-      // Puppeteer 側が読み取れる形で URL のクエリにプロンプトを渡す
-      // 例: index.html?prompt=xxxx
+      // Puppeteer が読み取る → 生成 → index.html?img=画像URL で戻して表示
       window.location.href = `index.html?prompt=${encodeURIComponent(prompt)}`;
     });
   </script>
