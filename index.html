@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>画像生成サイト（HuggingFace）連携</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button { padding: 8px; font-size: 16px; }
+    #image-container img { max-width: 600px; margin-top: 10px; }
+    #loading { display: none; color: red; }
+  </style>
+</head>
+<body>
+
+  <h1>画像生成（HuggingFace）</h1>
+
+  <!-- プロンプト入力 -->
+  <label>プロンプトを入力してください：</label><br>
+  <input type="text" id="prompt-input" placeholder="例: anime girl, sunset light" style="width: 60%;">
+  <button id="generate-btn">送信</button>
+
+  <p id="loading">生成中・・・しばらくお待ちください。</p>
+
+  <hr>
+
+  <!-- 画像表示エリア -->
+  <div id="image-container">
+    <h2>生成された画像</h2>
+    <img id="generated-image" src="" alt="生成画像" style="display: none;">
+  </div>
+
+  <script>
+    // Puppeteer が返してきた画像URLをここにセットするための関数
+    function showImage(imageUrl) {
+      const img = document.getElementById('generated-image');
+      img.src = imageUrl;
+      img.style.display = 'block';
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // フォーム送信 → Puppeteer に渡す処理
+    document.getElementById('generate-btn').addEventListener('click', () => {
+      const prompt = document.getElementById('prompt-input').value;
+      if (!prompt) return alert('プロンプトを入力してください');
+
+      // ローディング表示
+      document.getElementById('loading').style.display = 'block';
+
+      // Puppeteer 側が読み取れる形で URL のクエリにプロンプトを渡す
+      // 例: index.html?prompt=xxxx
+      window.location.href = `index.html?prompt=${encodeURIComponent(prompt)}`;
+    });
+  </script>
+
+</body>
+</html>
