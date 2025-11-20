@@ -1,69 +1,36 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>画像生成サイト（HuggingFace）連携</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { padding: 8px; font-size: 16px; }
-    #image-container img { max-width: 600px; margin-top: 10px; }
-    #loading { display: none; color: red; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>画像生成テスト</title>
 </head>
 <body>
-
   <h1>画像生成（HuggingFace）</h1>
 
-  <!-- プロンプト入力 -->
-  <label>プロンプトを入力してください：</label><br>
-  <input type="text" id="prompt-input" placeholder="例: anime girl, sunset light" style="width: 60%;">
-  <button id="generate-btn">送信</button>
+  <form id="genForm">
+    <input type="text" id="prompt" placeholder="プロンプト入力" required />
+    <button type="submit">送信</button>
+  </form>
 
-  <p id="loading">生成中・・・しばらくお待ちください。</p>
-
-  <hr>
-
-  <!-- 画像表示エリア -->
-  <div id="image-container">
-    <h2>生成された画像</h2>
-    <img id="generated-image" src="" alt="生成画像" style="display: none;">
-  </div>
+  <div id="result"></div>
 
   <script>
-    /** ---------------------------
-     * ① Puppeteer から img=URL が戻ってきたらすぐ表示
-     * -------------------------- */
-    function getQuery(key) {
-      return new URLSearchParams(window.location.search).get(key);
-    }
-    const imgUrl = getQuery('img');
-    if (imgUrl) {
-      showImage(imgUrl);
-    }
+    document.getElementById('genForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value;
 
-    /** ---------------------------
-     * ② 画像表示関数（Puppeteer が呼んでもOK）
-     * -------------------------- */
-    function showImage(imageUrl) {
-      const img = document.getElementById('generated-image');
-      img.src = imageUrl;
-      img.style.display = 'block';
-      document.getElementById('loading').style.display = 'none';
-    }
+      const res = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
 
-    /** ---------------------------
-     * ③ Puppeteer にプロンプトを渡す処理
-     * -------------------------- */
-    document.getElementById('generate-btn').addEventListener('click', () => {
-      const prompt = document.getElementById('prompt-input').value;
-      if (!prompt) return alert('プロンプトを入力してください');
-
-      document.getElementById('loading').style.display = 'block';
-
-      // Puppeteer が読み取る → 生成 → index.html?img=画像URL で戻して表示
-      window.location.href = `index.html?prompt=${encodeURIComponent(prompt)}`;
+      const data = await res.json();
+      document.getElementById('result').innerHTML = `
+        <p>生成された画像:</p>
+        <img src="${data.imageUrl}" width="400">
+      `;
     });
   </script>
-
 </body>
 </html>
